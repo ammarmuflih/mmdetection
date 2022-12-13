@@ -36,6 +36,8 @@ class CocoDataset(CustomDataset):
                'mouse', 'remote', 'keyboard', 'cell phone', 'microwave',
                'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock',
                'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush')
+    
+    # CLASSES = ('person','bottle','chair','couch','plant','bed','table','tv','laptop','refrigerator')
 
     PALETTE = [(220, 20, 60), (119, 11, 32), (0, 0, 142), (0, 0, 230),
                (106, 0, 228), (0, 60, 100), (0, 80, 100), (0, 0, 70),
@@ -58,6 +60,10 @@ class CocoDataset(CustomDataset):
                (127, 167, 115), (59, 105, 106), (142, 108, 45), (196, 172, 0),
                (95, 54, 80), (128, 76, 255), (201, 57, 1), (246, 0, 122),
                (191, 162, 208)]
+    
+    # PALETTE = [(220, 20, 60),(197, 226, 255),(153, 69, 1),(3, 95, 161),
+    #             (163, 255, 0),(119, 0, 170),(0, 182, 199),(183, 130, 88),
+    #             (95, 32, 0),(59, 105, 106)]
 
     def load_annotations(self, ann_file):
         """Load annotation from COCO style annotation file.

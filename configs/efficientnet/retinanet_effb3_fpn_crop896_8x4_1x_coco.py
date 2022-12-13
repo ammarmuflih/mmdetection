@@ -15,7 +15,7 @@ model = dict(
         out_indices=(3, 4, 5),
         frozen_stages=0,
         norm_cfg=dict(
-            type='SyncBN', requires_grad=True, eps=1e-3, momentum=0.01),
+            type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
         norm_eval=False,
         init_cfg=dict(
             type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
@@ -65,8 +65,8 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=4,
-    workers_per_gpu=4,
+    samples_per_gpu=1,
+    workers_per_gpu=1,
     train=dict(pipeline=train_pipeline),
     val=dict(pipeline=test_pipeline),
     test=dict(pipeline=test_pipeline))
@@ -86,9 +86,9 @@ lr_config = dict(
     warmup_ratio=0.1,
     step=[8, 11])
 # runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=12)
+runner = dict(type='EpochBasedRunner', max_epochs=2)
 
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.
 # base_batch_size = (8 GPUs) x (4 samples per GPU)
-auto_scale_lr = dict(base_batch_size=32)
+auto_scale_lr = dict(base_batch_size=1)

@@ -83,6 +83,12 @@ def coco_classes():
     ]
 
 
+# def coco_classes():
+#     return [
+#         'person','bottle','chair','couch','plant','bed','table','tv','laptop','refrigerator'
+#     ]
+
+
 def cityscapes_classes():
     return [
         'person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle',
