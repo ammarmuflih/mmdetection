@@ -181,6 +181,6 @@ auto_scale_lr = dict(base_batch_size=1)
 
 
 #Eval interval
-evaluation = dict(interval=10)
+evaluation = dict(interval=1)
 
 
