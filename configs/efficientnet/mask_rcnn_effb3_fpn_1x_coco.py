@@ -12,7 +12,7 @@ model = dict(
         arch='b0',
         drop_path_rate=0.2,
         out_indices=(3, 4, 5),
-        frozen_stages=-1,
+        frozen_stages=0,
         norm_cfg=dict(
             type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
         norm_eval=False,
@@ -172,7 +172,7 @@ lr_config = dict(
     warmup_ratio=0.1,
     step=[8, 11])
 # runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=10)
+runner = dict(type='EpochBasedRunner', max_epochs=30)
 
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.
