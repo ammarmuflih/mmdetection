@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/models/retinanet_r50_fpn.py',
+    '../_base_/models/mask_rcnn_r50_fpn.py',
     '../_base_/datasets/coco_detection.py', '../_base_/default_runtime.py'
 ]
 
@@ -26,7 +26,7 @@ model = dict(
         relu_before_extra_convs=True,
         no_norm_on_lateral=True,
         norm_cfg=norm_cfg),
-    bbox_head=dict(type='RetinaSepBNHead', num_ins=5, norm_cfg=norm_cfg),
+    #bbox_head=dict(type='RetinaSepBNHead', num_ins=5, norm_cfg=norm_cfg),
     # training and testing settings
     train_cfg=dict(assigner=dict(neg_iou_thr=0.5)))
 
@@ -36,7 +36,7 @@ img_norm_cfg = dict(
 img_size = (896, 896)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
     dict(
         type='Resize',
         img_scale=img_size,
@@ -47,7 +47,7 @@ train_pipeline = [
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size=img_size),
     dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels','gt_masks']),
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -64,6 +64,8 @@ test_pipeline = [
             dict(type='Collect', keys=['img']),
         ])
 ]
+dataset_type = 'COCODataset'
+classes = ('person','car')
 data = dict(
     samples_per_gpu=1,
     workers_per_gpu=1,
@@ -74,7 +76,7 @@ data = dict(
 optimizer_config = dict(grad_clip=None)
 optimizer = dict(
     type='SGD',
-    lr=0.04,
+    lr=0.001,
     momentum=0.9,
     weight_decay=0.0001,
     paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))
@@ -86,9 +88,11 @@ lr_config = dict(
     warmup_ratio=0.1,
     step=[8, 11])
 # runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=2)
+runner = dict(type='EpochBasedRunner', max_epochs=100)
 
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.
 # base_batch_size = (8 GPUs) x (4 samples per GPU)
 auto_scale_lr = dict(base_batch_size=1)
+
+evaluation = dict(interval=50)
