@@ -1,6 +1,6 @@
 _base_ = [
     '../_base_/models/mask_rcnn_r50_fpn.py',
-    '../_base_/datasets/coco_detection.py', '../_base_/default_runtime.py'
+    '../_base_/datasets/coco_instance.py', '../_base_/default_runtime.py'
 ]
 
 cudnn_benchmark = True
@@ -20,12 +20,14 @@ model = dict(
         init_cfg=dict(
             type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
     neck=dict(
+        type='FPN',
         in_channels=[48, 136, 384],
         start_level=0,
         out_channels=256,
         relu_before_extra_convs=True,
         no_norm_on_lateral=True,
-        norm_cfg=norm_cfg),
+        norm_cfg=norm_cfg,
+        num_outs=5),
     #bbox_head=dict(type='RetinaSepBNHead', num_ins=5, norm_cfg=norm_cfg),
     # training and testing settings
     train_cfg=dict(assigner=dict(neg_iou_thr=0.5)))
@@ -95,4 +97,4 @@ runner = dict(type='EpochBasedRunner', max_epochs=100)
 # base_batch_size = (8 GPUs) x (4 samples per GPU)
 auto_scale_lr = dict(base_batch_size=1)
 
-evaluation = dict(interval=50)
+evaluation = dict(interval=10)
