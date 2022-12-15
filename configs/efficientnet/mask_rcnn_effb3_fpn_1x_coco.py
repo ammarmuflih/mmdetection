@@ -22,7 +22,7 @@ model = dict(
             type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
     
     neck=dict(
-        in_channels=[48, 136, 384]),
+        in_channels=[72, 136, 384]),
 
     #bbox_head=dict(type='RetinaSepBNHead', num_ins=5, norm_cfg=norm_cfg),
     # training and testing settings
