@@ -7,7 +7,7 @@ cudnn_benchmark = True
 norm_cfg = dict(type='BN', requires_grad=True)
 checkpoint = 'https://download.openmmlab.com/mmclassification/v0/efficientnet/efficientnet-b3_3rdparty_8xb32-aa_in1k_20220119-5b4887a0.pth'  # noqa
 model = dict(
-    backbone=dict(
+     backbone=dict(
         _delete_=True,
         type='EfficientNet',
         arch='b3',
@@ -19,71 +19,82 @@ model = dict(
         norm_eval=False,
         init_cfg=dict(
             type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
+    
+    neck=dict(
+        in_channels=[48, 136, 384],
+        start_level=0,
+        out_channels=256,
+        relu_before_extra_convs=True,
+        no_norm_on_lateral=True,
+        norm_cfg=norm_cfg),
+
     #bbox_head=dict(type='RetinaSepBNHead', num_ins=5, norm_cfg=norm_cfg),
     # training and testing settings
     roi_head=dict(
         bbox_head=dict(
-            num_classes=80),
+            num_classes=2),
         mask_head=dict(
-            num_classes=80))
-    )
-# # dataset settings
-# img_norm_cfg = dict(
-#     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
-# img_size = (896, 896)
-# train_pipeline = [
-#     dict(type='LoadImageFromFile'),
-#     dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
-#     dict(
-#         type='Resize',
-#         img_scale=img_size,
-#         ratio_range=(0.8, 1.2),
-#         keep_ratio=True),
-#     dict(type='RandomCrop', crop_size=img_size),
-#     dict(type='RandomFlip', flip_ratio=0.5),
-#     dict(type='Normalize', **img_norm_cfg),
-#     dict(type='Pad', size=img_size),
-#     dict(type='DefaultFormatBundle'),
-#     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels','gt_masks']),
-# ]
-# test_pipeline = [
-#     dict(type='LoadImageFromFile'),
-#     dict(
-#         type='MultiScaleFlipAug',
-#         img_scale=img_size,
-#         flip=False,
-#         transforms=[
-#             dict(type='Resize', keep_ratio=True),
-#             dict(type='RandomFlip'),
-#             dict(type='Normalize', **img_norm_cfg),
-#             dict(type='Pad', size=img_size),
-#             dict(type='ImageToTensor', keys=['img']),
-#             dict(type='Collect', keys=['img']),
-#         ])
-# ]
+            num_classes=2))
+)
+# dataset settings
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+img_size = (896, 896)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(
+        type='Resize',
+        img_scale=img_size,
+        ratio_range=(0.8, 1.2),
+        keep_ratio=True),
+    dict(type='RandomCrop', crop_size=img_size),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(type='Normalize', **img_norm_cfg),
+    dict(type='Pad', size=img_size),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels','gt_masks']),
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=img_size,
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(type='Normalize', **img_norm_cfg),
+            dict(type='Pad', size=img_size),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img']),
+        ])
+]
+
 dataset_type = 'COCODataset'
 classes = ('person','car')
 data = dict(
     samples_per_gpu=1,
     workers_per_gpu=1,
-    # train=dict(pipeline=train_pipeline),
-    # val=dict(pipeline=test_pipeline),
-    # test=dict(pipeline=test_pipeline)
-    )
+    train=dict(pipeline=train_pipeline),
+    val=dict(pipeline=test_pipeline),
+    test=dict(pipeline=test_pipeline)
+)
+
 # optimizer
 optimizer_config = dict(grad_clip=None)
 optimizer = dict(
     type='SGD',
     lr=0.001,
     momentum=0.9,
-    weight_decay=0.0001,
-    paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))
+    weight_decay=0.0001)
+
 # learning policy
 lr_config = dict(
     policy='step',
     warmup='linear',
-    warmup_iters=1000,
-    warmup_ratio=0.1,
+    warmup_iters=500,
+    warmup_ratio=0.001,
     step=[8, 11])
 # runtime settings
 runner = dict(type='EpochBasedRunner', max_epochs=100)

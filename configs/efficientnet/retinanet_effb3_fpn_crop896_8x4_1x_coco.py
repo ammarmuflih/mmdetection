@@ -1,6 +1,6 @@
 _base_ = [
-    '../_base_/models/mask_rcnn_r50_fpn.py',
-    '../_base_/datasets/coco_instance.py', '../_base_/default_runtime.py'
+    '../_base_/models/retinanet_r50_fpn.py',
+    '../_base_/datasets/coco_detection.py', '../_base_/default_runtime.py'
 ]
 
 cudnn_benchmark = True
@@ -15,20 +15,18 @@ model = dict(
         out_indices=(3, 4, 5),
         frozen_stages=0,
         norm_cfg=dict(
-            type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
+            type='SyncBN', requires_grad=True, eps=1e-3, momentum=0.01),
         norm_eval=False,
         init_cfg=dict(
             type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
     neck=dict(
-        type='FPN',
         in_channels=[48, 136, 384],
         start_level=0,
         out_channels=256,
         relu_before_extra_convs=True,
         no_norm_on_lateral=True,
-        norm_cfg=norm_cfg,
-        num_outs=5),
-    #bbox_head=dict(type='RetinaSepBNHead', num_ins=5, norm_cfg=norm_cfg),
+        norm_cfg=norm_cfg),
+    bbox_head=dict(type='RetinaSepBNHead', num_ins=5, norm_cfg=norm_cfg),
     # training and testing settings
     train_cfg=dict(assigner=dict(neg_iou_thr=0.5)))
 
@@ -38,7 +36,7 @@ img_norm_cfg = dict(
 img_size = (896, 896)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(type='LoadAnnotations', with_bbox=True),
     dict(
         type='Resize',
         img_scale=img_size,
@@ -49,7 +47,7 @@ train_pipeline = [
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size=img_size),
     dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels','gt_masks']),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -66,11 +64,9 @@ test_pipeline = [
             dict(type='Collect', keys=['img']),
         ])
 ]
-dataset_type = 'COCODataset'
-classes = ('person','car')
 data = dict(
-    samples_per_gpu=1,
-    workers_per_gpu=1,
+    samples_per_gpu=4,
+    workers_per_gpu=4,
     train=dict(pipeline=train_pipeline),
     val=dict(pipeline=test_pipeline),
     test=dict(pipeline=test_pipeline))
@@ -78,7 +74,7 @@ data = dict(
 optimizer_config = dict(grad_clip=None)
 optimizer = dict(
     type='SGD',
-    lr=0.001,
+    lr=0.04,
     momentum=0.9,
     weight_decay=0.0001,
     paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))
@@ -90,11 +86,9 @@ lr_config = dict(
     warmup_ratio=0.1,
     step=[8, 11])
 # runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=100)
+runner = dict(type='EpochBasedRunner', max_epochs=12)
 
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.
 # base_batch_size = (8 GPUs) x (4 samples per GPU)
-auto_scale_lr = dict(base_batch_size=1)
-
-evaluation = dict(interval=10)
+auto_scale_lr = dict(base_batch_size=32)
