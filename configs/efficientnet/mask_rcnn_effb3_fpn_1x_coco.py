@@ -24,7 +24,7 @@ data = dict(
         ann_file='/home/ammar/Documents/mmdetection/data/coco/annotations/filtered_labels_test.json'))
 
 
-
+checkpoint = '/home/ammar/Documents/mmdetection/efficientnet-b5-b6417697.pth'
 cudnn_benchmark = True
 norm_cfg = dict(type='BN', requires_grad=True)
 model = dict(
@@ -38,7 +38,8 @@ model = dict(
         norm_cfg=dict(
             type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
         norm_eval=False,
-        init_cfg=None),
+        init_cfg=dict(
+            type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
 
     neck=dict(
         type='FPN',
