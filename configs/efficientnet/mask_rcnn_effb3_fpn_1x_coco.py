@@ -57,7 +57,7 @@ model = dict(
             num_classes=2),
         mask_head=dict(
             type='FCNMaskHead',
-            num_classes=2)
+            num_classes=2))
 )
 
 
