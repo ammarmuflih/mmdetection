@@ -23,31 +23,6 @@ data = dict(
         classes=classes,
         ann_file='/home/ammar/Documents/mmdetection/data/coco/annotations/filtered_labels_test.json'))
 
-# optimizer
-optimizer_config = dict(grad_clip=None)
-optimizer = dict(
-    type='SGD',
-    lr=0.001,
-    momentum=0.9,
-    weight_decay=0.001,
-    paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))
-# learning policy
-lr_config = dict(
-    policy='step',
-    warmup='linear',
-    warmup_iters=1000,
-    warmup_ratio=0.1,
-    step=[8, 11])
-# runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=30)
-
-# NOTE: `auto_scale_lr` is for automatically scaling LR,
-# USER SHOULD NOT CHANGE ITS VALUES.
-# base_batch_size = (8 GPUs) x (4 samples per GPU)
-auto_scale_lr = dict(base_batch_size=1)
-
-#Eval interval
-evaluation = dict(interval=10)
 
 
 cudnn_benchmark = True
@@ -74,9 +49,42 @@ model = dict(
         no_norm_on_lateral=True,
         norm_cfg=norm_cfg),
     
-    train_cfg=dict(assigner=dict(neg_iou_thr=0.5))
+    train_cfg=dict(assigner=dict(neg_iou_thr=0.5)),
+
+    roi_head=dict(
+        bbox_head=dict(
+            type='Shared2FCBBoxHead',
+            num_classes=2),
+        mask_head=dict(
+            type='FCNMaskHead',
+            num_classes=2)
 )
 
 
+# optimizer
+optimizer_config = dict(grad_clip=None)
+optimizer = dict(
+    type='SGD',
+    lr=0.001,
+    momentum=0.9,
+    weight_decay=0.001,
+    paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))
+# learning policy
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=1000,
+    warmup_ratio=0.1,
+    step=[8, 11])
+# runtime settings
+runner = dict(type='EpochBasedRunner', max_epochs=30)
+
+# NOTE: `auto_scale_lr` is for automatically scaling LR,
+# USER SHOULD NOT CHANGE ITS VALUES.
+# base_batch_size = (8 GPUs) x (4 samples per GPU)
+auto_scale_lr = dict(base_batch_size=1)
+
+#Eval interval
+evaluation = dict(interval=10)
 
 
