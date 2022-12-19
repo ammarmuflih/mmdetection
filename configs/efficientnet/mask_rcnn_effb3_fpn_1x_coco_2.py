@@ -26,7 +26,7 @@ model = dict(
         relu_before_extra_convs=True,
         no_norm_on_lateral=True,
         norm_cfg=norm_cfg),
-    bbox_head=dict(type='RetinaSepBNHead', num_ins=5, norm_cfg=norm_cfg),
+    rpn_head=dict(type='RPNHead', num_ins=5, norm_cfg=norm_cfg),
     # training and testing settings
     train_cfg=dict(assigner=dict(neg_iou_thr=0.5)),
     roi_head=dict(
