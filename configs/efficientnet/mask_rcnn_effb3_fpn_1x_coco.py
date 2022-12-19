@@ -34,7 +34,7 @@ model = dict(
         arch='b5',
         drop_path_rate=0.2,
         out_indices=(3, 4, 5),
-        frozen_stages=5,
+        frozen_stages=0,
         norm_cfg=dict(
             type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
         norm_eval=False,

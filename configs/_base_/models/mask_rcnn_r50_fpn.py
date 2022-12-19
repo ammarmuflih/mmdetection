@@ -1,21 +1,31 @@
 # model settings
+norm_cfg = dict(type='BN', requires_grad=True)
 model = dict(
     type='MaskRCNN',
     backbone=dict(
-        type='ResNet',
-        depth=50,
-        num_stages=4,
-        out_indices=(0, 1, 2, 3),
-        frozen_stages=1,
-        norm_cfg=dict(type='BN', requires_grad=True),
-        norm_eval=True,
-        style='pytorch',
-        init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')),
+        type='EfficientNet',
+        arch='b5',
+        drop_path_rate=0.2,
+        out_indices=(3, 4, 5),
+        frozen_stages=0,
+        norm_cfg=dict(
+            type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
+        norm_eval=False,
+        init_cfg=None),
     neck=dict(
         type='FPN',
-        in_channels=[256, 512, 1024, 2048],
+        in_channels=[64, 176, 512],
+        start_level=0,
         out_channels=256,
+        relu_before_extra_convs=True,
+        no_norm_on_lateral=True,
+        norm_cfg=norm_cfg,
         num_outs=5),
+    # neck=dict(
+    #     type='FPN',
+    #     in_channels=[64, 176, 512],
+    #     out_channels=256,
+    #     num_outs=5),
     rpn_head=dict(
         type='RPNHead',
         in_channels=256,
