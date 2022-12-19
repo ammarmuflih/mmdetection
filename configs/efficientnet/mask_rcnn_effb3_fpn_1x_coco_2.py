@@ -20,7 +20,7 @@ model = dict(
         init_cfg=dict(
             type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
     neck=dict(
-        in_channels=[48, 136, 384],
+        in_channels=[64, 176, 512],
         start_level=0,
         out_channels=256,
         relu_before_extra_convs=True,
@@ -82,7 +82,7 @@ data = dict(
 optimizer_config = dict(grad_clip=None)
 optimizer = dict(
     type='SGD',
-    lr=0.04,
+    lr=0.001,
     momentum=0.9,
     weight_decay=0.0001,
     paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))
@@ -94,7 +94,7 @@ lr_config = dict(
     warmup_ratio=0.1,
     step=[8, 11])
 # runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=12)
+runner = dict(type='EpochBasedRunner', max_epochs=30)
 
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.
