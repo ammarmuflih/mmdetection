@@ -16,15 +16,6 @@ model = dict(
             type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
         norm_eval=False,
         init_cfg=None),
-    # neck=dict(
-    #     type='FPN',
-    #     in_channels=[64, 176, 512],
-    #     start_level=0,
-    #     out_channels=256,
-    #     relu_before_extra_convs=True,
-    #     no_norm_on_lateral=True,
-    #     norm_cfg=norm_cfg,
-    #     num_outs=5),
     neck=dict(
         type='FPN',
         in_channels=[64, 176, 512],
