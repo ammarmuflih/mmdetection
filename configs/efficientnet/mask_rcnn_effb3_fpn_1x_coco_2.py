@@ -32,10 +32,10 @@ model = dict(
     roi_head=dict(
         bbox_head=dict(
             type='Shared2FCBBoxHead',
-            num_classes=1),
+            num_classes=2),
         mask_head=dict(
             type='FCNMaskHead',
-            num_classes=1))
+            num_classes=2))
     )
 
 # dataset settings
