@@ -6,7 +6,7 @@ _base_ = [
 
 #Perdataset an
 dataset_type = 'COCODataset'
-classes = ('person','car')
+classes = ('background','person','car')
 data = dict(
     samples_per_gpu=4,
     workers_per_gpu=1,
