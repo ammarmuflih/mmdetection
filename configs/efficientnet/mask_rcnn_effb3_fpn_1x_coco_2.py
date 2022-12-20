@@ -2,7 +2,6 @@ _base_ = [
     '../_base_/datasets/coco_instance.py',
     '../_base_/schedules/schedule_1x.py', '../_base_/default_runtime.py'
 ]
-norm_cfg = dict(type='BN', requires_grad=True)
 # model settings
 model = dict(
     type='MaskRCNN',
