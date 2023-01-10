@@ -3,12 +3,21 @@ _base_ = [
     '../_base_/schedules/schedule_1x.py', '../_base_/default_runtime.py'
 ]
 # model settings
+checkpoint = 'https://download.openmmlab.com/mmclassification/v0/efficientnet/efficientnet-b3_3rdparty_8xb32-aa_in1k_20220119-5b4887a0.pth'  # noqa
 model = dict(
     type='MaskRCNN',
     backbone=dict(
+        _delete_=True,
         type='EfficientNet',
-        model_type='efficientnet-b4',  # Possible types: ['efficientnet-b0' ... 'efficientnet-b7']
-        out_indices=(0, 1, 3, 6)),
+        arch='b3',
+        drop_path_rate=0.2,
+        out_indices=(3, 4, 5),
+        frozen_stages=0,
+        norm_cfg=dict(
+            type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
+        norm_eval=False,
+        init_cfg=dict(
+            type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
     neck=dict(
         type='FPN',
         in_channels=[24, 40, 112, 1280],
