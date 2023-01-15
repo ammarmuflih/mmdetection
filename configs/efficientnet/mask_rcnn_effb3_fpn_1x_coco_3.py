@@ -1,7 +1,9 @@
 _base_ = [
-    '../_base_/models/mask_rcnn_r50_fpn.py',
-    '../_base_/datasets/coco_instnaces.py', '../_base_/default_runtime.py'
+    '../_base_/models/faster_rcnn_r50_fpn.py',
+    '../_base_/datasets/coco_detection.py', '../_base_/default_runtime.py'
 ]
+import mmdet
+mmdet.datasets.coco.CocoDataset.CLASSES=('person','car')
 
 cudnn_benchmark = True
 norm_cfg = dict(type='BN', requires_grad=True)
@@ -10,7 +12,7 @@ model = dict(
     backbone=dict(
         _delete_=True,
         type='EfficientNet',
-        arch='b3',
+        arch='b5',
         drop_path_rate=0.2,
         out_indices=(3, 4, 5),
         frozen_stages=0,
@@ -20,15 +22,19 @@ model = dict(
         init_cfg=dict(
             type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
     neck=dict(
-        in_channels=[48, 136, 384],
+        in_channels=[64, 176, 512],
         start_level=0,
         out_channels=256,
         relu_before_extra_convs=True,
         no_norm_on_lateral=True,
         norm_cfg=norm_cfg),
+    roi_head=dict(
+        bbox_head=dict(
+            num_classes=2)),
     #bbox_head=dict(type='RetinaSepBNHead', num_ins=5, norm_cfg=norm_cfg),
     # training and testing settings
     train_cfg=dict(assigner=dict(neg_iou_thr=0.5)))
+    
 
 # dataset settings
 img_norm_cfg = dict(
@@ -74,7 +80,7 @@ data = dict(
 optimizer_config = dict(grad_clip=None)
 optimizer = dict(
     type='SGD',
-    lr=0.04,
+    lr=0.01,
     momentum=0.9,
     weight_decay=0.0001,
     paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))
@@ -86,9 +92,11 @@ lr_config = dict(
     warmup_ratio=0.1,
     step=[8, 11])
 # runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=12)
+runner = dict(type='EpochBasedRunner', max_epochs=50)
 
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.
 # base_batch_size = (8 GPUs) x (4 samples per GPU)
 auto_scale_lr = dict(base_batch_size=32)
+
+#evaluation = dict(interval=50)
