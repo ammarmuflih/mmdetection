@@ -99,4 +99,4 @@ runner = dict(type='EpochBasedRunner', max_epochs=50)
 # base_batch_size = (8 GPUs) x (4 samples per GPU)
 auto_scale_lr = dict(base_batch_size=32)
 
-#evaluation = dict(interval=50)
+evaluation = dict(interval=50)
