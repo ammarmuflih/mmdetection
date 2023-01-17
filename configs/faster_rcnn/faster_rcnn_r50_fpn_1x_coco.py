@@ -5,4 +5,4 @@ _base_ = [
 ]
 import mmdet
 mmdet.datasets.coco.CocoDataset.CLASSES=('person','car')
-evaluation = dict(interval=50)
+evaluation = dict(interval=10)

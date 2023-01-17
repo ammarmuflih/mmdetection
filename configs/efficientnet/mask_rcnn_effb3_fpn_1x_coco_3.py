@@ -1,6 +1,6 @@
 _base_ = [
-    '../_base_/models/faster_rcnn_r50_fpn.py',
-    '../_base_/datasets/coco_detection.py', '../_base_/default_runtime.py'
+    '../_base_/models/maskrcnn_rcnn_r50_fpn.py',
+    '../_base_/datasets/coco_instance.py', '../_base_/default_runtime.py'
 ]
 import mmdet
 mmdet.datasets.coco.CocoDataset.CLASSES=('person','car')
@@ -12,17 +12,16 @@ model = dict(
     backbone=dict(
         _delete_=True,
         type='EfficientNet',
-        arch='b5',
+        arch='b3',
         drop_path_rate=0.2,
         out_indices=(3, 4, 5),
         frozen_stages=0,
         norm_cfg=dict(
             type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
         norm_eval=False,
-        init_cfg=dict(
-            type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
+        init_cfg=None),
     neck=dict(
-        in_channels=[64, 176, 512],
+        in_channels=[48, 136, 384],
         start_level=0,
         out_channels=256,
         relu_before_extra_convs=True,
@@ -39,7 +38,7 @@ model = dict(
 # dataset settings
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
-img_size = (896, 896)
+img_size = (640, 640)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
@@ -71,8 +70,8 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=1,
-    workers_per_gpu=1,
+    samples_per_gpu=2,
+    workers_per_gpu=2,
     train=dict(pipeline=train_pipeline),
     val=dict(pipeline=test_pipeline),
     test=dict(pipeline=test_pipeline))
@@ -80,7 +79,7 @@ data = dict(
 optimizer_config = dict(grad_clip=None)
 optimizer = dict(
     type='SGD',
-    lr=0.01,
+    lr=0.04,
     momentum=0.9,
     weight_decay=0.0001,
     paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))

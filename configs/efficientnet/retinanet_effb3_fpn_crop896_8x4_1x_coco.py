@@ -2,6 +2,8 @@ _base_ = [
     '../_base_/models/retinanet_r50_fpn.py',
     '../_base_/datasets/coco_detection.py', '../_base_/default_runtime.py'
 ]
+import mmdet
+mmdet.datasets.coco.CocoDataset.CLASSES=('person','car')
 
 cudnn_benchmark = True
 norm_cfg = dict(type='BN', requires_grad=True)
@@ -15,10 +17,9 @@ model = dict(
         out_indices=(3, 4, 5),
         frozen_stages=0,
         norm_cfg=dict(
-            type='SyncBN', requires_grad=True, eps=1e-3, momentum=0.01),
+            type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
         norm_eval=False,
-        init_cfg=dict(
-            type='Pretrained', prefix='backbone', checkpoint=checkpoint)),
+        init_cfg=None),
     neck=dict(
         in_channels=[48, 136, 384],
         start_level=0,
@@ -33,7 +34,7 @@ model = dict(
 # dataset settings
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
-img_size = (896, 896)
+img_size = (640, 640)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', with_bbox=True),
@@ -65,8 +66,8 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=4,
-    workers_per_gpu=4,
+    samples_per_gpu=2,
+    workers_per_gpu=2,
     train=dict(pipeline=train_pipeline),
     val=dict(pipeline=test_pipeline),
     test=dict(pipeline=test_pipeline))
@@ -86,9 +87,10 @@ lr_config = dict(
     warmup_ratio=0.1,
     step=[8, 11])
 # runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=12)
+runner = dict(type='EpochBasedRunner', max_epochs=10)
 
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.
 # base_batch_size = (8 GPUs) x (4 samples per GPU)
 auto_scale_lr = dict(base_batch_size=32)
+evaluation = dict(interval=10)
