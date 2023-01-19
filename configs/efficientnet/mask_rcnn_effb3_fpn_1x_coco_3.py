@@ -1,6 +1,6 @@
 _base_ = [
-    '../_base_/models/maskrcnn_rcnn_r50_fpn.py',
-    '../_base_/datasets/coco_instance.py', '../_base_/default_runtime.py'
+    '../_base_/models/faster_rcnn_r50_fpn.py',
+    '../_base_/datasets/coco_detection.py', '../_base_/default_runtime.py'
 ]
 import mmdet
 mmdet.datasets.coco.CocoDataset.CLASSES=('person','car')
@@ -13,20 +13,14 @@ model = dict(
         _delete_=True,
         type='EfficientNet',
         arch='b3',
-        drop_path_rate=0.2,
         out_indices=(3, 4, 5),
         frozen_stages=0,
         norm_cfg=dict(
-            type='BN', requires_grad=True, eps=1e-3, momentum=0.01),
-        norm_eval=False,
+            type='BN', requires_grad=True),
+        norm_eval=True,
         init_cfg=None),
     neck=dict(
-        in_channels=[48, 136, 384],
-        start_level=0,
-        out_channels=256,
-        relu_before_extra_convs=True,
-        no_norm_on_lateral=True,
-        norm_cfg=norm_cfg),
+        in_channels=[48, 136, 384]),
     roi_head=dict(
         bbox_head=dict(
             num_classes=2)),
@@ -70,8 +64,8 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=2,
-    workers_per_gpu=2,
+    samples_per_gpu=1,
+    workers_per_gpu=1,
     train=dict(pipeline=train_pipeline),
     val=dict(pipeline=test_pipeline),
     test=dict(pipeline=test_pipeline))
@@ -79,7 +73,7 @@ data = dict(
 optimizer_config = dict(grad_clip=None)
 optimizer = dict(
     type='SGD',
-    lr=0.04,
+    lr=0.001,
     momentum=0.9,
     weight_decay=0.0001,
     paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))
@@ -91,11 +85,10 @@ lr_config = dict(
     warmup_ratio=0.1,
     step=[8, 11])
 # runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=50)
+runner = dict(type='EpochBasedRunner', max_epochs=10)
 
 # NOTE: `auto_scale_lr` is for automatically scaling LR,
 # USER SHOULD NOT CHANGE ITS VALUES.
 # base_batch_size = (8 GPUs) x (4 samples per GPU)
 auto_scale_lr = dict(base_batch_size=32)
-
-evaluation = dict(interval=50)
+evaluation = dict(interval=10)

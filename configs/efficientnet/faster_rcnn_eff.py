@@ -6,22 +6,22 @@ _base_ = [
 
 import mmdet
 mmdet.datasets.coco.CocoDataset.CLASSES=('person','car')
-evaluation = dict(interval=50)
+evaluation = dict(interval=10)
 
 model = dict(
     type='FasterRCNN',
     backbone=dict(
-        _delete_=True,
-        type='EfficientNet',
-        arch='b5',
+        type='ResNeXt',
+        depth=50,
+        num_stages=4,
         out_indices=(0, 1, 2, 3),
-        frozen_stages=0,
-        norm_cfg=dict(
-            type='BN', requires_grad=True),
+        frozen_stages=1,
+        norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
-        init_cfg=None),
-    neck=dict(
-        in_channels=[48, 24, 40, 64]))
+        style='pytorch',
+        init_cfg=None))
+    # neck=dict(
+    #     in_channels=[48, 136, 384]))
     # training and testing settings
     #train_cfg=dict(assigner=dict(neg_iou_thr=0.5)))
 

@@ -75,7 +75,7 @@ data = dict(
 optimizer_config = dict(grad_clip=None)
 optimizer = dict(
     type='SGD',
-    lr=0.04,
+    lr=0.01,
     momentum=0.9,
     weight_decay=0.0001,
     paramwise_cfg=dict(norm_decay_mult=0, bypass_duplicate=True))
